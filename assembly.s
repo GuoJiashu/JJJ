@@ -6,7 +6,7 @@
 
 
 .data
- prompt: .asciz "SA"
+ prompt: .asciz "SA!"
 
  substitutionTable: .asciz "ZYXWVUTSRQPONMLKJIHGFEDCBA"
 
@@ -18,17 +18,11 @@ main:
 	LDR R1, =prompt
 	LDR R2, =substitutionTable
 	MOV R8, #0
-	LDR R4, =10
 
-	B applycipher
-
-
-
+	BL applycipher
+	B end
 
 applycipher:
-
-	CMP R4, #0
-	BEQ end
 
 	CMP R8, #0
 	BEQ encoder
@@ -37,9 +31,8 @@ applycipher:
 encoder:
 
 	LDRB R5, [R1], #1
-
 	CMP R5, #'A'
-	BLT next_char
+	BLT encoder_done
 	CMP R5, #'Z'
 	BGT next_char
 
@@ -55,9 +48,8 @@ encoder_done:
 decoder:
 
 	LDRB R5, [R1], #1
-
 	CMP R5, #'A'
-	BLT next_char
+	BLT decoder_done
 	CMP R5, #'Z'
 	BGT next_char
 
@@ -66,19 +58,18 @@ decoder:
 	CMP R5, #26
 	BGT next_char
 
-	LDRB R5, [R2, R5]
+	STRB R5, [R2, R5]
 	STRB R5, [R1, #-1]!
 	B next_char
 
-devoder_done:
+decoder_done:
 
 	BX LR
 
-
 next_char:
 
-	LDRB R6, [R1], #1
-	CMP R6, #0
+	LDRB R5, [R1], #1
+	CMP R5, #0
 	BEQ convert_done
 	B applycipher
 
