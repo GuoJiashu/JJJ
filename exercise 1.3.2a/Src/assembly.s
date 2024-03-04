@@ -7,7 +7,7 @@
 .data
 @ define variables
 
-string1: .asciz "a!"
+string1: .asciz "A!"
 @ storing a string with null
 
 
