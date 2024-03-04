@@ -27,7 +27,7 @@ string_loop:
     BEQ finished_cipher  @ If it's null (0), then jump out of the loop
 
     ADD R4, R4, R2  @ Apply Caesar Cipher shift
-    STRB R4, [R0, R3]  @ Store the modified byte in the string buffer
+    STRB R4, [R1, R3]  @ Store the modified byte in the string buffer
 
     ADD R3, R3, #1  @ Increment the index
     B string_loop  @ Loop to the next byte
