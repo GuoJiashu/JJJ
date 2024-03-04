@@ -7,7 +7,6 @@
 @ define variables
 
 ascii_string: .asciz "Hello, World!\n" @ Define a null-terminated ASCII string
-@string_buffer: .space 100 @ Define space for the modified string buffer
 
 .text
 @ define text
