@@ -32,16 +32,13 @@ main:
     MOV R8, #0x00
 
     // Call the function to read and retransmit
-    BL read_and_retransmit
-
-loop_forever:
-    B loop_forever
-
-read_and_retransmit:
-    // Load the base address of USART1 into R0
-    LDR R0, =USART1
+    BL receive_loop
 
 receive_loop:
+
+	// Load the base address of USART1 into R0
+    LDR R0, =USART1
+
     // Load the UART ISR register into R1
     LDR R1, [R0, USART_ISR]
 
@@ -66,18 +63,18 @@ receive_loop:
     // Increment index counter R8
     ADD R8, #1
 
-    // Check if the received character matches the terminating_char
-    CMP R3, terminating_char
-
-    // If received character matches terminating_char, exit loop
-    BEQ transmit_string
-
     // Check if the index counter R8 exceeds the buffer size
     CMP R7, R8
 
     // If index counter exceeds buffer size, reset index counter R8
     BGT no_reset
     MOV R8, #0
+
+    // Check if the received character matches the terminating_char
+    CMP R3, terminating_char
+
+    // If received character matches terminating_char, exit loop
+    BEQ transmit_string
 
 no_reset:
     // Request to reset the UART receiver
@@ -111,7 +108,7 @@ copy_loop:
     // Call function to transmit the string
     BL transmit_string_uart
 
-    B read_and_retransmit
+    B receive_loop
 
 // Function to clear UART error flags and continue loop
 clear_error:
