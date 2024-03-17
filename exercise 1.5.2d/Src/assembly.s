@@ -11,7 +11,7 @@
 incoming_buffer: .space 62
 incoming_counter: .byte 62
 terminating_char: .asciz "a"
-tx_buffer: .space 62  @ Buffer for transmitting received string
+tx_string: .space 62
 
 .text
 
@@ -32,10 +32,11 @@ main:
     MOV R8, #0x00
 
     // Call the function to read and retransmit
-    BL receive_and_transmit
+    BL receive_loop
 
-receive_and_transmit:
-    // Load the base address of USART1 into R0
+receive_loop:
+
+	// Load the base address of USART1 into R0
     LDR R0, =USART1
 
     // Load the UART ISR register into R1
@@ -51,7 +52,7 @@ receive_and_transmit:
     TST R1, 1 << UART_RXNE
 
     // If no data is received, continue loop
-    BEQ receive_and_transmit
+    BEQ receive_loop
 
     // Read the received character from USART_RDR into R3
     LDRB R3, [R0, USART_RDR]
@@ -70,7 +71,9 @@ receive_and_transmit:
     MOV R8, #0
 
     // Check if the received character matches the terminating_char
-    CMP R3, #'a'  @ Assuming 'a' is the terminating character
+    CMP R3, terminating_char
+
+    // If received character matches terminating_char, exit loop
     BEQ transmit_string
 
 no_reset:
@@ -80,7 +83,7 @@ no_reset:
     STR R1, [R0, USART_RQR]
 
     // Continue loop
-    BGT receive_and_transmit
+    BGT receive_loop
 
 transmit_string:
     // Load the base address of USART1 into R0
@@ -89,45 +92,42 @@ transmit_string:
     // Load the address of incoming_buffer into R2
     LDR R2, =incoming_buffer
 
-    // Load the length of incoming_buffer into R7
+    // Load the value from incoming_counter into R7
     LDRB R7, [R7]
 
-    // Load the address of tx_buffer into R3
-    LDR R3, =tx_buffer
+    // Load the address of tx_string into R3
+    LDR R3, =tx_string
 
-    // Copy the received string to tx_buffer for retransmission
-    MOV R8, #0          // Reset index counter
+    // Copy the received string to tx_string for retransmission
 copy_loop:
-    LDRB R4, [R2, R8]  // Load byte from incoming_buffer
-    STRB R4, [R3, R8]  // Store byte to tx_buffer
-    ADD R8, #1         // Increment index counter
-    CMP R8, R7         // Compare index with length
-    BNE copy_loop      // Repeat if not at end of string
+    LDRB R4, [R2], #1    // Load byte from incoming_buffer and increment R2
+    STRB R4, [R3], #1    // Store byte to tx_string and increment R3
+    SUBS R7, #1          // Decrement counter R7
+    BNE copy_loop        // Continue copying if counter is not zero
 
     // Call function to transmit the string
     BL transmit_string_uart
 
-    B receive_and_transmit
+    B receive_loop
 
 // Function to clear UART error flags and continue loop
 clear_error:
     LDR R1, [R0, USART_ICR]
     ORR R1, 1 << UART_ORECF | 1 << UART_FECF
     STR R1, [R0, USART_ICR]
-    B receive_and_transmit
+    B receive_loop
 
-// Function to transmit the string stored in tx_buffer via UART
+// Function to transmit the string stored in tx_string via UART
 transmit_string_uart:
     // Load the base address of USART1 into R0
     LDR R0, =USART1
 
-    // Load the address of tx_buffer into R3
-    LDR R3, =tx_buffer
+    // Load the address of tx_string into R3
+    LDR R3, =tx_string
 
-    // Load the length of tx_buffer into R4
-    LDRB R4, [R7]
+    // Load the length of tx_string into R4
+    LDR R4, =62
 
-    // Loop to transmit characters from the buffer
 transmit_loop:
     // Load the UART ISR register into R1
     LDR R1, [R0, USART_ISR]
@@ -136,14 +136,16 @@ transmit_loop:
     TST R1, 1 << UART_TXE
     BEQ transmit_loop
 
-    // Load byte from tx_buffer into R5 and increment pointer
+    // Load byte from tx_string into R5 and increment pointer
     LDRB R5, [R3], #1
 
     // Store byte into UART transmit data register
     STRB R5, [R0, USART_TDR]
 
     // Compare current character with end character
-    CMP R5, #'a'  @ Assuming 'a' is the terminating character
+    CMP R5, terminating_char
+
+    // Continue transmission if length counter is not zero
     BNE transmit_loop
 
     BX LR
