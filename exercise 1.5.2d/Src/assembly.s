@@ -8,146 +8,80 @@
 .data
 .align
 
-incoming_buffer: .space 62
-incoming_counter: .byte 62
-terminating_char: .asciz "a"
-tx_string: .space 62
+incoming_buffer: .space 62               @ Define a buffer to store incoming data
+incoming_counter: .byte 62               @ Counter for the incoming buffer
+terminating_char: .byte 'a'              @ Define the terminating character for data reception
+tx_string: .space 62                     @ Buffer for transmitting strings
 
 .text
 
 main:
-    // Initialize power, peripheral clocks, and UART
-    BL initialise_power
-    BL enable_peripheral_clocks
-    BL enable_uart
 
-    // Load addresses of incoming_buffer and incoming_counter
-    LDR R6, =incoming_buffer
-    LDR R7, =incoming_counter
+    BL initialise_power                  @ Call function to initialize power
+    BL enable_peripheral_clocks          @ Call function to enable peripheral clocks
+    BL enable_uart                       @ Call function to enable UART communication
 
-    // Load the value from incoming_counter into R7
-    LDRB R7, [R7]
+    LDR R6, =incoming_buffer            @ Load the address of the incoming buffer into R6
+    LDR R7, =incoming_counter            @ Load the address of the incoming counter into R7
 
-    // Initialize index counter R8
-    MOV R8, #0x00
+    LDRB R7, [R7]                        @ Load the value of incoming_counter into R7
 
-    // Call the function to read and retransmit
-    BL receive_loop
+    MOV R8, #0x00                        @ Initialize R8 to 0
+
+	LDR R0, =USART1                      @ Load the base address of USART1 into R0
+	LDR R4, =terminating_char            @ Load the address of the terminating character into R4
+	LDRB R4,[R4]                         @ Load the terminating character into R4
+
+    BL receive_loop                      @ Branch to the receive_loop function
 
 receive_loop:
 
-	// Load the base address of USART1 into R0
-    LDR R0, =USART1
+    LDR R1, [R0, USART_ISR]              @ Load the USART_ISR register into R1
 
-    // Load the UART ISR register into R1
-    LDR R1, [R0, USART_ISR]
+    TST R1, 1 << UART_ORE | 1 << UART_FE @ Test for UART overrun error (ORE) and framing error (FE)
 
-    // Check for UART errors: overrun error or framing error
-    TST R1, 1 << UART_ORE | 1 << UART_FE
+    BNE clear_error                      @ Branch if either error is detected
 
-    // If error flags are set, clear them and continue loop
-    BNE clear_error
+    TST R1, 1 << UART_RXNE               @ Test for RXNE (Receive Data Register Not Empty) flag
 
-    // Check if UART has received data
-    TST R1, 1 << UART_RXNE
+    BEQ receive_loop                     @ If RXNE is not set, branch back to receive_loop
 
-    // If no data is received, continue loop
-    BEQ receive_loop
+    LDRB R3, [R0, USART_RDR]             @ Load received data from USART_RDR into R3
 
-    // Read the received character from USART_RDR into R3
-    LDRB R3, [R0, USART_RDR]
+    STRB R3, [R6, R8]                    @ Store received byte into incoming_buffer at offset R8
 
-    // Store the received character into the incoming_buffer
-    STRB R3, [R6, R8]
+    ADD R8, #1                           @ Increment R8 to point to the next position in the buffer
 
-    // Increment index counter R8
-    ADD R8, #1
+    CMP R3, R4                           @ Compare received byte with terminating character
 
-    // Check if the index counter R8 exceeds the buffer size
-    CMP R7, R8
+    BEQ transmit_string                  @ If received byte equals terminating character, branch to transmit_string
 
-    // If index counter exceeds buffer size, reset index counter R8
-    BGT no_reset
-    MOV R8, #0
+clear_error:
 
-    // Check if the received character matches the terminating_char
-    CMP R3, terminating_char
-
-    // If received character matches terminating_char, exit loop
-    BEQ transmit_string
-
-no_reset:
-    // Request to reset the UART receiver
-    LDR R1, [R0, USART_RQR]
-    ORR R1, 1 << UART_RXFRQ
-    STR R1, [R0, USART_RQR]
-
-    // Continue loop
-    BGT receive_loop
+    LDR R1, [R0, USART_ICR]              @ Load the USART_ICR register into R1
+    ORR R1, 1 << UART_ORECF | 1 << UART_FECF @ Set the overrun error clear flag and framing error clear flag
+    STR R1, [R0, USART_ICR]              @ Store the modified value back to USART_ICR
+    B receive_loop                       @ Branch back to receive_loop
 
 transmit_string:
-    // Load the base address of USART1 into R0
-    LDR R0, =USART1
 
-    // Load the address of incoming_buffer into R2
-    LDR R2, =incoming_buffer
-
-    // Load the value from incoming_counter into R7
-    LDRB R7, [R7]
-
-    // Load the address of tx_string into R3
-    LDR R3, =tx_string
-
-    // Copy the received string to tx_string for retransmission
-copy_loop:
-    LDRB R4, [R2], #1    // Load byte from incoming_buffer and increment R2
-    STRB R4, [R3], #1    // Store byte to tx_string and increment R3
-    SUBS R7, #1          // Decrement counter R7
-    BNE copy_loop        // Continue copying if counter is not zero
-
-    // Call function to transmit the string
-    BL transmit_string_uart
-
-    B receive_loop
-
-// Function to clear UART error flags and continue loop
-clear_error:
-    LDR R1, [R0, USART_ICR]
-    ORR R1, 1 << UART_ORECF | 1 << UART_FECF
-    STR R1, [R0, USART_ICR]
-    B receive_loop
-
-// Function to transmit the string stored in tx_string via UART
-transmit_string_uart:
-    // Load the base address of USART1 into R0
-    LDR R0, =USART1
-
-    // Load the address of tx_string into R3
-    LDR R3, =tx_string
-
-    // Load the length of tx_string into R4
-    LDR R4, =62
+    BL enable_uart                       @ Call function to enable UART communication
+    LDR R0, =USART1                      @ Load the base address of USART1 into R0
 
 transmit_loop:
-    // Load the UART ISR register into R1
-    LDR R1, [R0, USART_ISR]
 
-    // Check if UART transmitter is empty
-    TST R1, 1 << UART_TXE
-    BEQ transmit_loop
+    LDR R1, [R0, USART_ISR]              @ Load the USART_ISR register into R1
 
-    // Load byte from tx_string into R5 and increment pointer
-    LDRB R5, [R3], #1
+    TST R1, 1 << UART_TXE                @ Test for TXE (Transmit Data Register Empty) flag
+    BEQ transmit_loop                    @ If TXE is not set, branch back to transmit_loop
 
-    // Store byte into UART transmit data register
-    STRB R5, [R0, USART_TDR]
+    LDRB R5, [R6], #1                    @ Load a byte from the tx_string buffer and increment the buffer pointer
 
-    // Compare current character with end character
-    CMP R5, terminating_char
+    STRB R5, [R0, USART_TDR]             @ Transmit the loaded byte via USART_TDR
 
-    // Continue transmission if length counter is not zero
-    BNE transmit_loop
+    CMP R5, R4                           @ Compare transmitted byte with terminating character
 
-    BX LR
+    BNE transmit_loop                    @ If transmitted byte is not the terminating character, branch back to transmit_loop
 
-.end
+	B receive_loop                       @ Branch back to receive_loop
+    BX LR                                 @ Return from main function
