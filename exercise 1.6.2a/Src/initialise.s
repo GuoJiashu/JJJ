@@ -30,20 +30,3 @@ initialise_discovery_board:
 	LDR R1, =0x5555
 	STRH R1, [R0, #MODER + 2]
 	BX LR
-
-trigger_prescaler:
-
-	LDR R0, =TIM2
-
-	LDR R1, =0x1
-	STR R1, [R0, TIM_ARR]
-
-	LDR R8, =0x00
-	STR R8, [R0, TIM_CNT]
-	NOP
-	NOP
-
-	LDR R1, =0xffffffff
-	STR R1, [R0, TIM_ARR]
-
-	BX LR
