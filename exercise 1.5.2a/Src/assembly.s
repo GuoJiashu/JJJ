@@ -39,35 +39,36 @@ program_loop:
 
 tx_loop:
 
-	LDR R0, =USART1     @ Load address of USART1 into R0
+	LDR R0, =USART1     	@ Load address of USART1 into R0
 
-	LDR R3, =tx_string  @ Load address of tx_string into R3
-	LDR R4, =tx_length  @ Load address of tx_length into R4
+	LDR R1, =tx_string  	@ Load address of tx_string into R1
+	LDR R3, =tx_length  	@ Load address of tx_length into R3
 
-	LDR R4, [R4]        @ Load value from memory address stored in R4 into R4
+	LDR R4, [R3]        	@ Load value from memory address stored in R3 into R4
 
 
 tx_uart:
 
-	LDR R1, [R0, USART_ISR]   @ Load USART ISR register into R1
-	ANDS R1, 1 << UART_TXE    @ Perform bitwise AND operation to check UART_TXE flag
+	LDR R2, [R0, USART_ISR]   	@ Load USART ISR register into R2
+	ANDS R2, 1 << UART_TXE    	@ Perform bitwise AND operation to check UART_TXE flag
 
-	BEQ tx_uart               @ Branch back to tx_uart if UART_TXE flag is not set
+	BEQ tx_uart               	@ Branch back to tx_uart if UART_TXE flag is not set
 
-	LDRB R5, [R3], #1         @ Load byte from memory address pointed to by R3 into R5 and increment R3
-	STRB R5, [R0, USART_TDR]  @ Store byte from R5 into USART transmit data register
+	LDRB R5, [R1], #1         	@ Load byte from memory address pointed to by R1 into R5 and increment R1
+	STRB R5, [R0, USART_TDR]  	@ Store byte from R5 into USART transmit data register
 
-	SUBS R4, #1          @ Subtract 1 from R4 (tx_length)
+	SUBS R4, #1          		@ Subtract 1 from R4 (tx_length)
 
-	                     @ Compare R5 with ASCII code for '?'
+	                     		@ Compare R5 with ASCII code for '?'
 	CMP R5, #'?'
-	BEQ end_transmission @ Branch to end_transmission if equal
+	BEQ end_transmission 		@ Branch to end_transmission if equal
 
-	BGT tx_uart          @ Branch to tx_uart if R5 is greater than '?'
+	BGT tx_uart          		@ Branch to tx_uart if R5 is greater than '?'
 
-	BL delay_loop        @ Call delay_loop subroutine
+	BL delay_loop        		@ Call delay_loop subroutine
 
-	B tx_loop            @ Branch back to tx_loop
+	B tx_loop            		@ Branch back to tx_loop
+
 
 end_transmission:
 
