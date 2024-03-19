@@ -197,7 +197,8 @@ The following figures provides an input and output for the system separately. It
 ![image](https://github.com/GuoJiashu/JJJ/assets/160695086/1b05b641-dbce-4ac6-b385-05e5cce4ef9d)
 
 The output change into the corresponding cipher character after encoding. However, the symbol "!" is not converted because it is out of the range that the system could be able to encode, hence, it just skip the process of encoding and directly go through the {end_loop}. 
-![image](https://github.com/GuoJiashu/JJJ/assets/160695086/4135f27a-184a-4b1f-aeb8-7a908a34904f)
+![image](https://github.com/GuoJiashu/JJJ/assets/160695086/2f1b5f5b-6cc7-43a0-aaf6-251a1649ac9f)
+
 
 
 After all this, the final result will appear on R1, we need to check memory, monitor the address of R1, select ASCII, and we will see the string after transfer.
