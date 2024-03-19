@@ -314,7 +314,7 @@ LED:
 
 	B program_loop
 ```
-##Output 
+## Output 
 The pattern of light would be ON one by one as the button is pressing, and it would be turned off in sequence by pressing the button again if all the LEDs light up.
 
 ## Task D
