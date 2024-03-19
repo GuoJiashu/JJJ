@@ -24,22 +24,13 @@ main:
 
 	BL initialise_power          @ Call function to initialise power
 	BL enable_peripheral_clocks  @ Call function to enable peripheral clocks
-	BL enable_uart               @ Call function to enable UART
+	BL enable_uart4              @ Call function to enable UART
 
-	B program_loop               @ Branch to program loop
-
-program_loop:
-
-	LDR R0, =GPIOA      @ Load address of GPIOA into R0
-	LDRB R1, [R0, #0x10]@ Load byte from memory address GPIOA + 0x10 into R1
-	CMP R1, #255        @ Compare R1 with 255
-	BEQ tx_loop         @ Branch to tx_loop if equal
-
-	B program_loop      @ Branch back to program_loop if not equal
+	B tx_loop               @ Branch to program loop
 
 tx_loop:
 
-	LDR R0, =USART1     	@ Load address of USART1 into R0
+	LDR R0, =UART4     	@ Load address of USART1 into R0
 
 	LDR R1, =tx_string  	@ Load address of tx_string into R1
 	LDR R3, =tx_length  	@ Load address of tx_length into R3
@@ -74,8 +65,7 @@ tx_uart:
 
 end_transmission:
 
-	BL delay_loop        @ Call delay_loop subroutine
-	B program_loop       @ Branch back to program_loop
+	B end_transmission
 
 delay_loop:
 	LDR R9, =0xfffff     @ Load maximum delay value into R9
