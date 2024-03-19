@@ -622,7 +622,8 @@ pwm_off_loop:
 The PWM provide an almost absoluate square wave through reading the current time of TIM2 and compare it with the expected setting value. The loop continues to loop until the current value of time is greater than the setting value, and it produces an output after looping finishes. Similarly, the output from the function {pwm_on_loop} will be not generated only when the looping of {pwm_off_loop} is finished after comparing the current time. 
 
 ## Output
-![alt text](B6054E76-7FF7-4575-949F-03B13BAB1C48_1_105_c.jpeg)
+![image](https://github.com/GuoJiashu/JJJ/assets/160695086/24736331-ba70-4b0d-ac8f-c5f908dfb1d2)
+
 The discovered kit board outputs an frequency in 1.17 seconds by seleting the value of prescalar of 8 with a value of counter overflow of 1.
 ## Limitation
 
