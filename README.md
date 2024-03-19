@@ -330,7 +330,7 @@ tx_uart:
 
 	BL delay_loop        		@ Call delay_loop subroutine
 ```
-To achieve the target, the function of {tx_uart} should firstly load the USART ISR register to enable the board to recieve message. After that, the input message stored in the register needs to be transmitted into transmit data register. For each of time of button is pressed, a byte of character is transmitted into R5 through data transmitt register. Moreover, all the end of string put a "?" to tell the system which the message finishes so that the system would not loop again and again even though the message is finished transmitted. 
+To achieve the target, the function of {tx_uart} should firstly load the USART ISR register to enable the board to recieve message. After that, the input message stored in the register needs to be transmitted into transmit data register. For each of time of button is pressed, a byte of character is transmitted into R5 through data transmitt register. Moreover, all the end of string put a "?" to tell the system which the message finishes so that the system would not loop again and again even though the message is finished transmitted. Everytime we press the button, we will see message appeas on terminal progam like PuTTY
 
 ## Task B
 ```arm 
@@ -398,7 +398,7 @@ no_reset:
 	// Continue loop
 	BGT loop_forever
 ```
-This code above is main part of {loop_forever} after enabling the USART1, load {USART_ISR} and error checking to this function. For receiving the characters from computer, the port of USART_RDR is enable and stored into the R3. However, it should consider whether the buffer is full or not, the {incoming_counter} is used to check if the received data stored into buffer exceed the size of buffer. It would automatically jump to reset function to UART receiver while the string of character is oversizing. After that, the system would stop to loop if the receved character matche the {terminating_char}, otherwise, it will loop forever until the expected character matches with the string of data received. 
+This code above is main part of {loop_forever} after enabling the USART1, load {USART_ISR} and error checking to this function. For receiving the characters from computer, the port of USART_RDR is enable and stored into the R3. However, it should consider whether the buffer is full or not, the {incoming_counter} is used to check if the received data stored into buffer exceed the size of buffer. It would automatically jump to reset function to UART receiver while the string of character is oversizing. After that, the system would stop to loop if the receved character matche the {terminating_char}, otherwise, it will loop forever until the expected character matches with the string of data received. We will see the data we input from PuTTY appears on the address 0x20000000
 
 ## Task C
 
