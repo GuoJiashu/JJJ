@@ -276,6 +276,11 @@ LED:
 
 	B program_loop
 ```
+
+### Task D
+
+This part we will check how many centain alphabeta appears in a given string, when we run the code, every time we press button, the corresspond numbers of LED will light up, "AAbCccDDDDeeeffg", this is our string, the code will check from a to z, when we first press the button, check the number of "a/A", there are two "a/A", so two leds will light up, and will loop to letter "z/Z".
+
 ## 1.5 Exercise 3 (Serial communication)
 
 ### Task A
