@@ -27,12 +27,12 @@ main:
 
 program_loop:
 
-	LDR R0, =GPIOA	@ Port for the input button. Load the base address of GPIO port A into register R0. 
-	LDRB R1, [R0, #IDR] @Load the byte value from the Input Data Register (IDR) of GPIO port A into register R1. LDRB loads a byte showing the current state of all pins in port A
-	CMP R1, #255 @ Compare the value loaded into R1 with 255, checking if all bits in the IDR are set to 1 (button is pressed)
-	BEQ LED @ @ Branch to the label "LED" if the result of the comparison is equal to #255
+	LDR R0, =GPIOA		@ Port for the input button. Load the base address of GPIO port A into register R0. 
+	LDRB R1, [R0, #IDR] 	@ Load the byte value from the Input Data Register (IDR) of GPIO port A into register R1. LDRB loads a byte showing the current state of all pins in port A
+	CMP R1, #255 		@ Compare the value loaded into R1 with 255, checking if all bits in the IDR are set to 1 (button is pressed)
+	BEQ LED  		@ Branch to the label "LED" if the result of the comparison is equal to #255
 
-	B program_loop @ return to the program_loop label
+	B program_loop 		@ Return to the program_loop label
 
 LED:
 	LDR R0, =GPIOE  @ load the address of the GPIOE register into R0
