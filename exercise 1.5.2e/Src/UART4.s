@@ -12,7 +12,7 @@
 .align
 
 @ Define a string
-tx_string: .asciz "hello?\r\n"
+tx_string: .asciz "helloa\r\n"
 tx_length: .byte 10
 
 
@@ -24,13 +24,13 @@ main:
 
 	BL initialise_power          @ Call function to initialise power
 	BL enable_peripheral_clocks  @ Call function to enable peripheral clocks
-	BL enable_uart4              @ Call function to enable UART
+	BL enable_uart4               @ Call function to enable UART
 
-	B tx_loop                    @ Branch to program loop
+	B tx_loop               @ Branch to program loop
 
 tx_loop:
 
-	LDR R0, =UART4     	    @ Load address of USART1 into R0
+	LDR R0, =UART4     	@ Load address of USART1 into R0
 
 	LDR R1, =tx_string  	@ Load address of tx_string into R1
 	LDR R3, =tx_length  	@ Load address of tx_length into R3
@@ -48,15 +48,20 @@ tx_uart:
 	LDRB R5, [R1], #1         	@ Load byte from memory address pointed to by R1 into R5 and increment R1
 	STRB R5, [R0, USART_TDR]  	@ Store byte from R5 into USART transmit data register
 
+	BL confirmation
+
 	SUBS R4, #1          		@ Subtract 1 from R4 (tx_length)
 
 	                     		@ Compare R5 with ASCII code for '?'
-	CMP R5, #'?'
+	CMP R5, #'a'
 	BEQ end_transmission 		@ Branch to end_transmission if equal
 
-	BGT tx_uart          		@ Keep looping while there are more characters to send
+	BGT tx_uart          		@ Branch to tx_uart if R5 is greater than '?'
 
 	BL delay_loop        		@ Call delay_loop subroutine
+
+	B tx_loop            		@ Branch back to tx_loop
+
 
 end_transmission:
 
@@ -70,3 +75,8 @@ delay_inner:
 	SUBS R9, #1          @subtract 1 from R9
 	BGT delay_inner      @ Branch back to delay_inner if R9 is greater than 1
 	BX LR                @ Return from subroutine
+
+confirmation:
+
+	MOV R10, #1
+	BX LR
