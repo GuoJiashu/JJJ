@@ -1,16 +1,115 @@
+
 # System Operation Description and Interpretation
 
 ## 1.3 Module 1 (Memory and Pointers)
 
-### 1.3.1 Convert of upper and lower case of letter
+### Task A
+Task A aims to convert the letter either from lower case to upper case or in the opposite way by defining the ASCII string memory. 
+```arm
+.data
+@ define variables
 
-### 1.3.2 
+string1: .asciz "A!"
+@ storing a string with null
 
-### 1.3.3 Encode and Decode
----
+
+.text
+@ define text
+
+main:
+
+    LDR R1, =string1 @ load address of string1 to R1
+	MOV R2, #0 @ load a state in R2, 0 for lower-case mode, 1 for upper-case mode
+	BL convert_case @ store current data to R14 and go to convert-case
+
+	B end @ end
+
+convert_case:
+
+    CMP R2, #1 @ get the state
+    BEQ to_lower @ if equal, change to to-lower mode
+    B to_upper @ or change to to-upper mode
+```
+An input of string, 'A!', is defined and load into register 1. R2 is used to let the system to make decision which the system should jump to lower case conversion function or upper case conversion. 
+
+```arm
+to_lower:
+
+	LDRB R3, [R1], #1 @ load one byte from R3 and store to R1, offset is 1
+	@ compare R3 to 'A'
+    CMP R3, #'A'
+    BLT lower_done @ if less than, then skip
+    CMP R3, #'Z'
+    BGT next_char @ if greater than, go to next character
+    ADD R3, R3, #'a'-'A' @ convert to lower case
+    STRB R3, [R1, #-1]! @ store the converted character and decrement R1
+    B next_char @ go to the next character
+
+ lower_done:
+
+ 	BX LR @ return
+```
+{to_lower} function initially define the range of letter that it should include and exclude elements which is not required to be converted. Then, the system will gets the difference/gap of hexdecimal number of capital letter 'A' and lower case of 'a'. The difference between them should be 20 in hex number according to the ACSII table. Also, it is known that the hex number of capital letter is always 20 hex number smaller than the its corresponding letter in lower case. Hence, the system could only add that particular byte of character with its hex number so that it could get the right lower case value for the particular letter. After finishing conversion, it jump to the function of {next_char} which would reads its next byte of the string. 
+
+```arm 
+to_upper:
+
+	LDRB R3, [R1], #1 @ load one byte from R3 and store to R1, offset is 1
+    CMP R3, #'a'
+    BLT upper_done
+    CMP R3, #'z'
+    BGT next_char
+    SUB R3, R3, #'a'-'A' @ convert to upper case
+    STRB R3, [r1, #-1]! @ store the converted character and decrement R1
+    B next_char
+
+ upper_done:
+
+ 	BX LR
+```
+
+The function {to_upper} has the similar operation theory with the module of {to_lower}. The only thing which is necessary to be changed is that it is required to change the line of code from {ADD R3, R3, #'a' - 'A'} to {SUB R3, R3, #'a' - 'A'} because the lower-case English letters has a higher hexdecmial number than upper-case characters. 
+
+
+### Task B
+
+The purpose of building Task B is to allow the amount function module to shift value to be either negative or positive, which enable the decoding and encoding operation. 
+
+```arm 
+.data
+@ define variables
+
+ascii_string: .asciz "Hello, World!\n" @ Define a null-terminated ASCII string
+
+.text
+@ define text
+
+@ this is the entry function called from the startup file
+main:
+    LDR R1, =ascii_string  @ Load the address of the ASCII string into R1
+    LDR R2, =3  @ Load the Caesar Cipher shift value (positive or negative) into R2
+    BL caesar_cipher_counter  @ Apply Caesar Cipher
+    B finished_everything  @ Jump to the end of the program
+```
+As following the request of the task, the string loaded in R1 and the value that requires to shift stored load by R2. 
+
+```arm
+string_loop:
+    LDRB R4, [R1, R3]  @ Load a byte from the ASCII string
+    CMP R4, #0  @ Check if end of string
+    BEQ finished_cipher  @ If it's null (0), then jump out of the loop
+
+    ADD R4, R4, R2  @ Apply Caesar Cipher shift
+    STRB R4, [R1, R3]  @ Store the modified byte in the string buffer
+
+    ADD R3, R3, #1  @ Increment the index
+    B string_loop  @ Loop to the next byte
+```
+
+The main idea of this part is to add the amount of value which needs to be shift with the specific byte in the input string. After adding the setting shift value, the hexdecimal number of that particular byte increases and convert the expected character. R3 would have the increment of index of 1 which prepares one byte of space for the next converted value in byte. 
+### Task C
+
 The idea of the task is to develop a system which is allowed to encode or decode each byte of a wide range of letter input to the expected output. This behaviour is done by the system through comparing the correspoding character in a stirng with the input character so that the system could be able to get the expected output. 
-
-The basic operation theory of the system is that 
 
 Hence, it is required to build a substitution table and place an input for which is needed to be encoded or decoded at the beginning of this module task.
 
@@ -73,8 +172,193 @@ Decoder function completely applies the same theories with the function of encod
 
 **Output:**
 
+The following figures provides an input and output for the system separately. It is clear that the input of "HZ!" which stored in the register 1 that has the address of hexdecimal number of 0x200000000.
+![alt text](image.png)
+
+The output change into the corresponding cipher character after encoding. However, the symbol "!" is not converted because it is out of the range that the system could be able to encode, hence, it just skip the process of encoding and directly go through the {end_loop}. 
+![alt text](image-2.png)
+
+## 1.4 Exercise 2 (Digital I/O)
+
+### Task A
+
+The objective of task A is to enable the LED pattern. 
+
+```arm 
+main:
+	
+	LDR R4, = 0b00110011 
+
+	LDR R0, =GPIOE  
+	STRB R4, [R0, #ODR + 1]   
+	EOR R4, #0xFF	
+```
+To enable the LED pattern, the light pattern in binary is stored by R4 for later using. After that, it only needs to load the address of GPIOE and store it to the second byte of ODR. The LED pattern would be ON after toggling all of the bits in byte. 
+
+### Task B
+
+```arm
+main:
+
+	@ Branch with link to set the clocks for the I/O and UART
+	BL enable_peripheral_clocks
+
+	@ Once the clocks are started, need to initialise the discovery board I/O
+	BL initialise_discovery_board
+
+	@ store the current light pattern (binary mask) in R4
+	LDR R4, =0b00000000 @ load a pattern for the set of LEDs (every second one is on)
+```
+Enabling the peripheral clocks, initialising the discovery board and storing the pattern of light into R4 is the first thing which needs be specified. 
+
+---
+
+```arm 
+program_loop:
+
+	LDR R0, =GPIOA	@ port for the input button
+	LDRB R1, [R0, #IDR]
+	CMP R1, #255
+	BEQ LED
+
+	B program_loop @ return to the program_loop label
+```
+Enable the port(GPIOA) for the input button and ensure it is ON, which the system goes to the next module function after testing. 
+
+---
+
+```arm 
+LED:
+	LDR R0, =GPIOE  @ load the address of the GPIOE register into R0
+	STRB R4, [R0, #ODR + 1]   @ store this to the second byte of the ODR (bits 8-15)
+	LSL R4,R4,#1@EOR R4, #0xFF	@ toggle all of the bits in the byte (1->0 0->1)
+
+	ADD R4,R4,#1
+	BL delay_function
+	CMP R4,0b11111111
+	BEQ main
+
+	B program_loop
+```
+Enable the port of LED (GPIOE) and make the LED shifts next one by increment of 1. To ensure the system could be able to loop forever for every time the button is pressed, a reset function is setted while all of LED is ON after eight times of the button is pressed. 
+
+---
+```arm
+delay_function:
+	MOV R6, #0x0100000
+
+not_finished_yet:
+	SUBS R6, 0x01
+	BNE not_finished_yet
+
+	BX LR @ return from function call
+```
+Additionally, a delay function is imported to this system to increase the stability of the operation of system, which prevents from crash or error occuring during running process. 
+
+### Task C
+
+Task C requests to turn the LEDs off by pressing the button each time based on the previous assembly code in Task B. 
+
+The whole main body of functions are same with the code in previous function. The only differences is that it stores a binary value of 00000000 in 0 byte into R4 which controls the status of LED to be either ON or OFF that depends on the binary value it stores.
+
+```arm 
+LED:
+	LDR R0, =GPIOE  @ load the address of the GPIOE register into R0
+	STRB R4, [R0, #ODR + 1]   @ store this to the second byte of the ODR (bits 8-15)
+	LDR R4, =0b00000000
+
+	BL delay_function
+	LDR R0, =GPIOA	@ port for the input button
+	LDRB R1, [R0, #IDR]
+	CMP R1, #255
+	BEQ LED_2
+
+	B program_loop
+```
 
 
+## 1.6.2 Module 4 (Hardware Timer)
 
+The hardware timer is used to produce frequency output which is visulise through frequency flashes of LED. The system applies the timer of TIM2. 
 
+### Task A
+In task A, it is required to build a delay function which is able to be achieve by changing the value of prescalar so as to change the frequency of the output. 
 
+```arm
+main:
+
+    LDR R1, =7               
+    STR R1, [R0, TIM_PSC]      
+
+    BL trigger_prescaler
+
+trigger_prescaler:
+
+	LDR R0, =TIM2
+
+	BX LR
+```
+The lines of code indicates the prescalar of 7 is stored into R1 with the setting of TIM_PSC. The code would immediately jump to the function of {triiger_prescalar} and link back to the main function after it stores the prescalar into TIM2. The frequency of the timer could be able to change by selecting and adjusting the appropriate value of prescalar. 
+
+### Task B
+
+### Task C
+
+```arm
+main:
+
+    @ Set auto-reload register (TIM_ARR) for the desired period
+    LDR R1, =period           @ Load the period value
+    LDR R2, [R1]              @ Load the value into R2
+    STR R2, [R0, TIM_ARR]     @ Set the auto-reload register
+
+    LDR R1, =7             
+    STR R1, [R0, TIM_PSC]     
+
+    BL trigger_prescaler
+
+trigger_prescaler:
+
+	@ store a value for the prescaler
+	LDR R0, =TIM2	@ load the base address for the timer
+
+	LDR R1, = 1000@ make the timer overflow after counting to only 1
+	STR R1, [R0, TIM_ARR] @ set the ARR register
+
+	LDR R8, =0x00
+	STR R8, [R0, TIM_CNT] @ reset the clock
+	NOP
+	NOP
+
+	LDR R1, =0xffffffff @ set the ARR back to the default value
+	STR R1, [R0, TIM_ARR] @ set the ARR register
+
+	BX LR
+```
+
+Task C requires to build a preload function to increase the stability of the timer system so as to decrease the possibility of crash of system. Hence, {TIMX_ARR} and APSE = 1 are required to used to allow the timer to preceed auto-reload function. In detail, the count in TIM_CNT automatically gets set back to 0, and a signal is generated which sets a flag to demonstrate that the overflow happened when the count in the TIM_CNT register reaches the value stored in the TIM_ARR register and the count in TIM_CNT automatically get set back to 0. 
+
+Furthermore, PWM function, generating a more appropriate frequency output, is built to increase the reliability of the function. 
+```arm
+pwm_on_loop:
+	LDR R0, =TIM2  
+	LDR R6, [R0, TIM_CNT]	@ read current time
+
+	@ compare current time to on_time (R1)
+	CMP R6, R1
+	BGT pwm_off_cycle
+
+	B pwm_on_loop
+
+pwm_off_loop:
+	LDR R0, =TIM2  @ load the address of the timer 2 base address
+	LDR R6, [R0, TIM_CNT]	@ read current time
+
+	@ compare current time to period (R2)
+	CMP R6, R2
+	BGT pwm_on_cycle
+
+	B pwm_off_loop
+```
+
+The PWM provide an almost absoluate square wave through reading the current time of TIM2 and compare it with the expected setting value. The loop continues to loop until the current value of time is greater than the setting value, and it produces an output after looping finishes. Similarly, the output from the function {pwm_on_loop} will be not generated only when the looping of {pwm_off_loop} is finished after comparing the current time. 
