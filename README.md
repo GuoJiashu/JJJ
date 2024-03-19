@@ -32,6 +32,9 @@ convert_case:
 ```
 An input of string, 'A!', is defined and load into register 1. R2 is used to let the system to make decision which the system should jump to lower case conversion function or upper case conversion. 
 
+---
+---
+
 ```arm
 to_lower:
 
@@ -50,6 +53,9 @@ to_lower:
  	BX LR @ return
 ```
 {to_lower} function initially define the range of letter that it should include and exclude elements which is not required to be converted. Then, the system will gets the difference/gap of hexdecimal number of capital letter 'A' and lower case of 'a'. The difference between them should be 20 in hex number according to the ACSII table. Also, it is known that the hex number of capital letter is always 20 hex number smaller than the its corresponding letter in lower case. Hence, the system could only add that particular byte of character with its hex number so that it could get the right lower case value for the particular letter. After finishing conversion, it jump to the function of {next_char} which would reads its next byte of the string. 
+
+---
+---
 
 ```arm 
 to_upper:
@@ -70,6 +76,10 @@ to_upper:
 
 The function {to_upper} has the similar operation theory with the module of {to_lower}. The only thing which is necessary to be changed is that it is required to change the line of code from {ADD R3, R3, #'a' - 'A'} to {SUB R3, R3, #'a' - 'A'} because the lower-case English letters has a higher hexdecmial number than upper-case characters.
 After all this, the final result will appear on R1, we need to check memory, monitor the address of R1, select ASCII, and we will see the string after transfer.
+
+## Output
+All of the letters should be converted the either upper or lower case of characters which depends on the what the expected result that we want to. 
+
 
 ### Task B
 
@@ -92,7 +102,6 @@ main:
     B finished_everything  @ Jump to the end of the program
 ```
 As following the request of the task, the string loaded in R1 and the value that requires to shift stored load by R2. 
-
 ```arm
 string_loop:
     LDRB R4, [R1, R3]  @ Load a byte from the ASCII string
@@ -109,6 +118,9 @@ string_loop:
 The main idea of this part is to add the amount of value which needs to be shift with the specific byte in the input string. After adding the setting shift value, the hexdecimal number of that particular byte increases and convert the expected character. R3 would have the increment of index of 1 which prepares one byte of space for the next converted value in byte. 
 After all this, the final result will appear on R1, we need to check memory, monitor the address of R1, select ASCII, and we will see the string after transfer.
 
+## Output 
+All the input string is shifted by setting shift value of 3, which is stored in the address of 0x200000000 in hex number. Beyond this, all the the last three element of 'X''Y''Z' should corresponding to the letter of 'A''B''C' for each one independently.  
+
 ### Task C
 
 The idea of the task is to develop a system which is allowed to encode or decode each byte of a wide range of letter input to the expected output. This behaviour is done by the system through comparing the correspoding character in a stirng with the input character so that the system could be able to get the expected output. 
@@ -123,6 +135,9 @@ Hence, it is required to build a substitution table and place an input for which
 ```
 As shown above, the input strings are defined after ".data". The string of prompt indicates the input which could be manually input a range of letters. Furthermore, the string of substitutionTable is the table of substition cipher which allows the system to compare with the codes that is required to encode/decode. 
 
+---
+---
+
 ```arm
 main:
 
@@ -135,6 +150,9 @@ main:
 ```
 In the main function, the prompt is setted to loarded into the register 1 and the substution cipher is loarded into the register 2. Besides, the register 8 represents the decisions of either encoding or decoding. 
 
+---
+---
+
 ```arm
 encoder:
     @Part 1
@@ -144,6 +162,7 @@ encoder:
 	CMP R5, #'Z'
 	BGT next_char 
 
+	@Part 2
 	SUBS R5, R5, #'A'
 	LDRB R5, [R2,R5] 
 	STRB R5, [R1, #-1]!
@@ -175,11 +194,11 @@ Decoder function completely applies the same theories with the function of encod
 **Output:**
 
 The following figures provides an input and output for the system separately. It is clear that the input of "HZ!" which stored in the register 1 that has the address of hexdecimal number of 0x200000000.
-![Uploading image.png…]()
-
+![image](https://github.com/GuoJiashu/JJJ/assets/160695086/1b05b641-dbce-4ac6-b385-05e5cce4ef9d)
 
 The output change into the corresponding cipher character after encoding. However, the symbol "!" is not converted because it is out of the range that the system could be able to encode, hence, it just skip the process of encoding and directly go through the {end_loop}. 
-![alt text](image-2.png)
+![image](https://github.com/GuoJiashu/JJJ/assets/160695086/4135f27a-184a-4b1f-aeb8-7a908a34904f)
+
 
 After all this, the final result will appear on R1, we need to check memory, monitor the address of R1, select ASCII, and we will see the string after transfer.
 
@@ -199,7 +218,9 @@ main:
 	EOR R4, #0xFF	
 ```
 To enable the LED pattern, the light pattern in binary is stored by R4 for later using. After that, it only needs to load the address of GPIOE and store it to the second byte of ODR. The LED pattern would be ON after toggling all of the bits in byte. 
-Four LEDs will light up, two blue and two red.
+
+##Output
+Four LEDs will light up, two blue and two red on the board of STM32.
 
 ### Task B
 
@@ -218,6 +239,7 @@ main:
 Enabling the peripheral clocks, initialising the discovery board and storing the pattern of light into R4 is the first thing which needs be specified. 
 
 ---
+---
 
 ```arm 
 program_loop:
@@ -231,6 +253,7 @@ program_loop:
 ```
 Enable the port(GPIOA) for the input button and ensure it is ON, which the system goes to the next module function after testing. 
 
+---
 ---
 
 ```arm 
@@ -249,6 +272,8 @@ LED:
 Enable the port of LED (GPIOE) and make the LED shifts next one by increment of 1. To ensure the system could be able to loop forever for every time the button is pressed, a reset function is setted while all of LED is ON after eight times of the button is pressed. 
 
 ---
+---
+
 ```arm
 delay_function:
 	MOV R6, #0x0100000
@@ -259,8 +284,14 @@ not_finished_yet:
 
 	BX LR @ return from function call
 ```
-Additionally, a delay function is imported to this system to increase the stability of the operation of system, which prevents from crash or error occuring during running process. 
+Additionally, a delay function is imported to this system to increase the time of the operation of system, which prevents from fast transmitting from the system to the board while pressing the button. Furthermore, it increases the stability of the system and protect it from crashing or error occuring during running process. 
 Every time we press the button, one LED will be enabled untill all leds are enabled, then it will unenabled last time.
+
+##Output
+The light patterns would light one by one by pressing the button each time. 
+
+##Limitation
+The system could not loop forever while the button button is pressed all the time. It would go to the inifinity loop becasue of missing the function of turning off the LED. 
 
 ### Task C
 
@@ -282,6 +313,8 @@ LED:
 
 	B program_loop
 ```
+##Output 
+The pattern of light would be ON one by one as the button is pressing, and it would be turned off in sequence by pressing the button again if all the LEDs light up.
 
 ### Task D
 
@@ -319,6 +352,7 @@ tx_loop:
 	LDR R4, [R3]        
 ```
 ---
+---
 
 ```arm
 tx_uart:
@@ -342,6 +376,12 @@ tx_uart:
 	BL delay_loop        		@ Call delay_loop subroutine
 ```
 To achieve the target, the function of {tx_uart} should firstly load the USART ISR register to enable the board to recieve message. After that, the input message stored in the register needs to be transmitted into transmit data register. For each of time of button is pressed, a byte of character is transmitted into R5 through data transmitt register. Moreover, all the end of string put a "?" to tell the system which the message finishes so that the system would not loop again and again even though the message is finished transmitted. Everytime we press the button, we will see message appeas on terminal progam like PuTTY
+
+##Output 
+The function module would start to transmit the data, which stores in register 1, to another function by pressing the button each time. 
+
+##Limitation
+* Each end of string is required to have an '?', otherwise, the system does not know what is the end of the string it reads. It would keep looping forever.
 
 ## Task B
 ```arm 
@@ -487,7 +527,28 @@ trigger_prescaler:
 ```
 The lines of code indicates the prescalar of 7 is stored into R1 with the setting of TIM_PSC. The code would immediately jump to the function of {triiger_prescalar} and link back to the main function after it stores the prescalar into TIM2. The frequency of the timer could be able to change by selecting and adjusting the appropriate value of prescalar. 
 
+## Limitation 
+* The delay function need to check and compare to the count value in TIM_CNT and also it is required to set set the TIM_CNT to 0 manually. 
+
 ### Task B
+According to the data sheet, the formula of desired output frequency for STM32 is 
+
+        				Desired Output Frequency = TIM_CLK/((TIM_PSC + 1)/(TIM_ARR+1))
+
+The desired output frequency is 0.1ms, which equals to the frequency of 1*10^-4Hz.It is known that the TIM_CLK is 32MHz because the timer that used in the task is 32 bits timer. The value for the TIM_ARR is set as 100.
+
+    					Desired Output Frequency = TIM_CLK/((TIM_PSC + 1)/(TIM_ARR+1))
+
+                        				8*10^8Hz = 32MHz * 100/8
+
+                            					P= 2500
+
+Hence, the prescalar that is require to reach a 0.1ms for the prescalar is 3200. However, by considering the use of PWM function, the actual output of the function is required to be worked out. 
+
+    						Actual Output Frequency = Timer Frequency/(period+1)
+                            						= 8*8^8/8^10^4
+                           						=8*10^4Hz
+                            						= 0.1 millionsecond. 
 
 ### Task C
 
@@ -550,6 +611,9 @@ pwm_off_loop:
 
 The PWM provide an almost absoluate square wave through reading the current time of TIM2 and compare it with the expected setting value. The loop continues to loop until the current value of time is greater than the setting value, and it produces an output after looping finishes. Similarly, the output from the function {pwm_on_loop} will be not generated only when the looping of {pwm_off_loop} is finished after comparing the current time. 
 
+## Output
+![alt text](B6054E76-7FF7-4575-949F-03B13BAB1C48_1_105_c.jpeg)
+The discovered kit board outputs an frequency in 1.17 seconds by seleting the value of prescalar of 8 with a value of counter overflow of 1.
 ## Limitation
 
 * The output frequency of the discover board becomes hard to work out because of adding a PWM function to loop again and agagin. It increases the difficulty of calculations which not only needs to work out the prescalar value and value of counter overflow, it still needs to consider the element of period and on_time. 
