@@ -68,8 +68,8 @@ to_upper:
  	BX LR
 ```
 
-The function {to_upper} has the similar operation theory with the module of {to_lower}. The only thing which is necessary to be changed is that it is required to change the line of code from {ADD R3, R3, #'a' - 'A'} to {SUB R3, R3, #'a' - 'A'} because the lower-case English letters has a higher hexdecmial number than upper-case characters. 
-
+The function {to_upper} has the similar operation theory with the module of {to_lower}. The only thing which is necessary to be changed is that it is required to change the line of code from {ADD R3, R3, #'a' - 'A'} to {SUB R3, R3, #'a' - 'A'} because the lower-case English letters has a higher hexdecmial number than upper-case characters.
+After all this, the final result will appear on R1, we need to check memory, monitor the address of R1, select ASCII, and we will see the string after transfer.
 
 ### Task B
 
@@ -107,6 +107,8 @@ string_loop:
 ```
 
 The main idea of this part is to add the amount of value which needs to be shift with the specific byte in the input string. After adding the setting shift value, the hexdecimal number of that particular byte increases and convert the expected character. R3 would have the increment of index of 1 which prepares one byte of space for the next converted value in byte. 
+After all this, the final result will appear on R1, we need to check memory, monitor the address of R1, select ASCII, and we will see the string after transfer.
+
 ### Task C
 
 The idea of the task is to develop a system which is allowed to encode or decode each byte of a wide range of letter input to the expected output. This behaviour is done by the system through comparing the correspoding character in a stirng with the input character so that the system could be able to get the expected output. 
@@ -179,6 +181,8 @@ The following figures provides an input and output for the system separately. It
 The output change into the corresponding cipher character after encoding. However, the symbol "!" is not converted because it is out of the range that the system could be able to encode, hence, it just skip the process of encoding and directly go through the {end_loop}. 
 ![alt text](image-2.png)
 
+After all this, the final result will appear on R1, we need to check memory, monitor the address of R1, select ASCII, and we will see the string after transfer.
+
 ## 1.4 Exercise 2 (Digital I/O)
 
 ### Task A
@@ -195,6 +199,7 @@ main:
 	EOR R4, #0xFF	
 ```
 To enable the LED pattern, the light pattern in binary is stored by R4 for later using. After that, it only needs to load the address of GPIOE and store it to the second byte of ODR. The LED pattern would be ON after toggling all of the bits in byte. 
+Four LEDs will light up, two blue and two red.
 
 ### Task B
 
@@ -255,6 +260,7 @@ not_finished_yet:
 	BX LR @ return from function call
 ```
 Additionally, a delay function is imported to this system to increase the stability of the operation of system, which prevents from crash or error occuring during running process. 
+Every time we press the button, one LED will be enabled untill all leds are enabled, then it will unenabled last time.
 
 ### Task C
 
