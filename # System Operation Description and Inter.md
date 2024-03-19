@@ -173,7 +173,8 @@ Decoder function completely applies the same theories with the function of encod
 **Output:**
 
 The following figures provides an input and output for the system separately. It is clear that the input of "HZ!" which stored in the register 1 that has the address of hexdecimal number of 0x200000000.
-![alt text](image.png)
+![Uploading image.png…]()
+
 
 The output change into the corresponding cipher character after encoding. However, the symbol "!" is not converted because it is out of the range that the system could be able to encode, hence, it just skip the process of encoding and directly go through the {end_loop}. 
 ![alt text](image-2.png)
