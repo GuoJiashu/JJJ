@@ -19,7 +19,7 @@ main:
 
     BL initialise_power                  @ Call function to initialize power
     BL enable_peripheral_clocks          @ Call function to enable peripheral clocks
-    BL enable_usart1                     @ Call function to enable UART communication
+    BL enable_uart4                     @ Call function to enable UART communication
 
     LDR R6, =incoming_buffer             @ Load the address of the incoming buffer into R6
     LDR R7, =incoming_counter            @ Load the address of the incoming counter into R7
@@ -28,7 +28,7 @@ main:
 
     MOV R8, #0x00                        @ Initialize R8 to 0
 
-	LDR R0, =USART1                      @ Load the base address of USART1 into R0
+	LDR R0, =UART4                      @ Load the base address of USART1 into R0
 	LDR R4, =terminating_char            @ Load the address of the terminating character into R4
 	LDRB R4,[R4]                         @ Load the terminating character into R4
 
