@@ -275,7 +275,180 @@ LED:
 
 	B program_loop
 ```
+## 1.5 Exercise 3 (Serial communication)
 
+### Task A
+Task A is requested to build a function which allows to transmit a strings of characters from R1 to another function while the button on the STM 32 board is pressed. 
+
+By following the task, it should enable all the basic functions that it needs, which is shown as below.
+```arm
+main:
+
+	BL initialise_power          
+	BL enable_peripheral_clocks  
+	BL enable_uart              
+
+	B program_loop              
+program_loop:
+
+	LDR R0, =GPIOA      
+	LDRB R1, [R0, #0x10]
+	CMP R1, #255        
+	BEQ tx_loop         
+
+	B program_loop      
+tx_loop:
+
+	LDR R0, =USART1     	
+
+	LDR R1, =tx_string  	
+	LDR R3, =tx_length  	
+
+	LDR R4, [R3]        
+```
+---
+
+```arm
+tx_uart:
+
+	LDR R2, [R0, USART_ISR]   	@ Load USART ISR register into R2
+	ANDS R2, 1 << UART_TXE    	@ Perform bitwise AND operation to check UART_TXE flag
+
+	BEQ tx_uart               	@ Branch back to tx_uart if UART_TXE flag is not set
+
+	LDRB R5, [R1], #1         	@ Load byte from memory address pointed to by R1 into R5 and increment R1
+	STRB R5, [R0, USART_TDR]  	@ Store byte from R5 into USART transmit data register
+
+	SUBS R4, #1          		@ Subtract 1 from R4 (tx_length)
+
+	                     		@ Compare R5 with ASCII code for '?'
+	CMP R5, #'?'
+	BEQ end_transmission 		@ Branch to end_transmission if equal
+
+	BGT tx_uart          		@ Keep looping while there are more characters to send
+
+	BL delay_loop        		@ Call delay_loop subroutine
+```
+To achieve the target, the function of {tx_uart} should firstly load the USART ISR register to enable the board to recieve message. After that, the input message stored in the register needs to be transmitted into transmit data register. For each of time of button is pressed, a byte of character is transmitted into R5 through data transmitt register. Moreover, all the end of string put a "?" to tell the system which the message finishes so that the system would not loop again and again even though the message is finished transmitted. 
+
+## Task B
+```arm 
+.data
+.align
+
+incoming_buffer: .space 62
+
+incoming_counter: .byte 62
+
+terminating_char: .asciz "a"
+
+main:
+    LDR R6, =incoming_buffer
+	LDR R7, =incoming_counter
+
+	// Load the value from incoming_counter into R7
+	LDRB R7, [R7]
+
+	// Initialize index counter R8
+	MOV R8, #0x00
+```
+Before transmitting the input message of the function, a buffer address in 62 spaces is build for the data which should be transmistted later on. Also, the terminating character is set as an 'a'. 
+
+```arm
+loop_forever:
+
+	LDR R0, =USART1
+
+	LDR R1, [R0, USART_ISR]
+
+	TST R1, 1 << UART_ORE | 1 << UART_FE
+
+	BNE clear_error
+
+clear_error:
+
+	LDR R1, [R0, USART_ICR]
+	ORR R1, 1 << UART_ORECF | 1 << UART_FECF
+	STR R1, [R0, USART_ICR]
+	B loop_forever
+```
+The front part of the {loop_forever} function is set to check the error, such as overrun error or framing error, which may occur during the operation process. Therefore, a reset function is used to re-enable those registers to ensure it runs properly. 
+
+
+```arm
+loop_forever:
+   
+	LDRB R3, [R0, USART_RDR]
+	STRB R3, [R6, R8]
+	ADD R8, #1
+	CMP R7, R8
+	BGT no_reset
+	MOV R8, #0
+	CMP R3, terminating_char
+	BEQ end_loop
+
+no_reset:
+
+	// Request to reset the UART receiver
+	LDR R1, [R0, USART_RQR]
+	ORR R1, 1 << UART_RXFRQ
+	STR R1, [R0, USART_RQR]
+
+	// Continue loop
+	BGT loop_forever
+```
+This code above is main part of {loop_forever} after enabling the USART1, load {USART_ISR} and error checking to this function. For receiving the characters from computer, the port of USART_RDR is enable and stored into the R3. However, it should consider whether the buffer is full or not, the {incoming_counter} is used to check if the received data stored into buffer exceed the size of buffer. It would automatically jump to reset function to UART receiver while the string of character is oversizing. After that, the system would stop to loop if the receved character matche the {terminating_char}, otherwise, it will loop forever until the expected character matches with the string of data received. 
+
+## Task C
+
+## Task D
+This task is the combination of pervious first two tasks of this exercise. The function below is used to receive the input message of string through the port of {USART_RDR} which stored by R3. The system would keep storing the value until the terminate character is detected.
+
+```arm
+receive_loop:
+
+    LDR R1, [R0, USART_ISR]              @ Load the USART_ISR register into R1
+
+    TST R1, 1 << UART_ORE | 1 << UART_FE @ Test for UART overrun error (ORE) and framing error (FE)
+
+    BNE clear_error                      @ Branch if either error is detected
+
+    TST R1, 1 << UART_RXNE               @ Test for RXNE (Receive Data Register Not Empty) flag
+
+    BEQ receive_loop                     @ If RXNE is not set, branch back to receive_loop
+
+    LDRB R3, [R0, USART_RDR]             @ Load received data from USART_RDR into R3
+
+    STRB R3, [R6, R8]                    @ Store received byte into incoming_buffer at offset R8
+
+    ADD R8, #1                           @ Increment R8 to point to the next position in the buffer
+
+    CMP R3, R4                           @ Compare received byte with terminating character
+
+    BEQ transmit_string                  @ If received byte equals terminating character, branch to transmit_string
+```
+
+The {transmit_loop} receives the output of a string from the function of {tx_string}, which would store the received data into the {USART_TDR}. The data would be transmitted back to received loop after ensuring the terminating character is within the string. 
+
+```arm
+    transmit_loop:
+
+    LDR R1, [R0, USART_ISR]              @ Load the USART_ISR register into R1
+
+    TST R1, 1 << UART_TXE                @ Test for TXE (Transmit Data Register Empty) flag
+    BEQ transmit_loop                    @ If TXE is not set, branch back to transmit_loop
+
+    LDRB R5, [R6], #1                    @ Load a byte from the tx_string buffer and increment the buffer pointer
+
+    STRB R5, [R0, USART_TDR]             @ Transmit the loaded byte via USART_TDR
+
+    CMP R5, R4                           @ Compare transmitted byte with terminating character
+
+    BNE transmit_loop                    @ If transmitted byte is not the terminating character, branch back to transmit_loop
+
+	B receive_loop                       @ Branch back to receive_loop
+    BX LR                                 @ Return from main function
+```
 
 ## 1.6.2 Module 4 (Hardware Timer)
 
@@ -362,3 +535,7 @@ pwm_off_loop:
 ```
 
 The PWM provide an almost absoluate square wave through reading the current time of TIM2 and compare it with the expected setting value. The loop continues to loop until the current value of time is greater than the setting value, and it produces an output after looping finishes. Similarly, the output from the function {pwm_on_loop} will be not generated only when the looping of {pwm_off_loop} is finished after comparing the current time. 
+
+## Limitation
+
+* The output frequency of the discover board becomes hard to work out because of adding a PWM function to loop again and agagin. It increases the difficulty of calculations which not only needs to work out the prescalar value and value of counter overflow, it still needs to consider the element of period and on_time. 
