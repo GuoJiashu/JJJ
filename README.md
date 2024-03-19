@@ -426,7 +426,6 @@ clear_error:
 ```
 The front part of the {loop_forever} function is set to check the error, such as overrun error or framing error, which may occur during the operation process. Therefore, a reset function is used to re-enable those registers to ensure it runs properly. 
 
-
 ```arm
 loop_forever:
    
@@ -451,6 +450,12 @@ no_reset:
 ```
 This code above is main part of {loop_forever} after enabling the USART1, load {USART_ISR} and error checking to this function. For receiving the characters from computer, the port of USART_RDR is enable and stored into the R3. However, it should consider whether the buffer is full or not, the {incoming_counter} is used to check if the received data stored into buffer exceed the size of buffer. It would automatically jump to reset function to UART receiver while the string of character is oversizing. After that, the system would stop to loop if the receved character matche the {terminating_char}, otherwise, it will loop forever until the expected character matches with the string of data received. We will see the data we input from PuTTY appears on the address 0x20000000
 
+##Output 
+The function received the string characters, it would keep looping until the terminated characters are defined. 
+
+##Limitation 
+* The function would occur the error of framing and overrun error which is requested to put a clear error function to reset and re-enable those register.
+  
 ## Task C
 For this part, we just enabled the clock and change the baud rate, we use formula 8m/expected baud rate, we choose 57600, and we will have result 0x8C, then if we use PuTTY, we just need to turn to the right baud rate, we will see the transmission.
 
@@ -502,7 +507,10 @@ The {transmit_loop} receives the output of a string from the function of {tx_str
 	B receive_loop                       @ Branch back to receive_loop
     BX LR                                 @ Return from main function
 ```
+
+##Output
 This part, we use UART4 and USART1, one board recieve the input data from pc and the transmit to another board via UART4 and also transmit to PC via USART1, if we input message on one computer, when the terminal character is recieved, the PuTTY on another computer will simutanueouly show the message just entered on another computer
+
 
 ## 1.6.2 Module 4 (Hardware Timer)
 
@@ -549,6 +557,8 @@ Hence, the prescalar that is require to reach a 0.1ms for the prescalar is 3200.
                             						= 8*8^8/8^10^4
                            						=8*10^4Hz
                             						= 0.1 millionsecond. 
+##Output
+The LED of the board should be able to flases with a frequency of 8^10^4 Hz. 
 
 ### Task C
 
