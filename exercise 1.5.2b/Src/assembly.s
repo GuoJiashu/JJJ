@@ -66,18 +66,18 @@ loop_forever:
 	// Increment index counter R8
 	ADD R8, #1
 
-	// Check if the received character matches the terminating_char
-	CMP R3, terminating_char
-
-	// If received character matches terminating_char, exit loop
-	BEQ end_loop
-
 	// Check if the index counter R8 exceeds the buffer size
 	CMP R7, R8
 
 	// If index counter exceeds buffer size, reset index counter R8
 	BGT no_reset
 	MOV R8, #0
+
+	// Check if the received character matches the terminating_char
+	CMP R3, terminating_char
+
+	// If received character matches terminating_char, exit loop
+	BEQ end_loop
 
 no_reset:
 

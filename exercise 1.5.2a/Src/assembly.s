@@ -63,12 +63,9 @@ tx_uart:
 	CMP R5, #'?'
 	BEQ end_transmission 		@ Branch to end_transmission if equal
 
-	BGT tx_uart          		@ Branch to tx_uart if R5 is greater than '?'
+	BGT tx_uart          		@ Keep looping while there are more characters to send
 
 	BL delay_loop        		@ Call delay_loop subroutine
-
-	B tx_loop            		@ Branch back to tx_loop
-
 
 end_transmission:
 

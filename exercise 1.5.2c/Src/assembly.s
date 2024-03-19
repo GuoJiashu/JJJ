@@ -25,7 +25,7 @@ main:
 	BL initialise_power          @ Call function to initialise power
 	BL enable_peripheral_clocks  @ Call function to enable peripheral clocks
 	BL enable_uart               @ Call function to enable UART
-	BL change_clock_speed        @ Call function to change clock speed
+	@BL change_clock_speed        @ Call function to change clock speed
 
 	B program_loop               @ Branch to program loop
 
