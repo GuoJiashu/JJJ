@@ -220,7 +220,7 @@ main:
 ```
 To enable the LED pattern, the light pattern in binary is stored by R4 for later using. After that, it only needs to load the address of GPIOE and store it to the second byte of ODR. The LED pattern would be ON after toggling all of the bits in byte. 
 
-##Output
+## Output
 Four LEDs will light up, two blue and two red on the board of STM32.
 
 ## Task B
@@ -291,7 +291,7 @@ Every time we press the button, one LED will be enabled untill all leds are enab
 ##Output
 The light patterns would light one by one by pressing the button each time. 
 
-##Limitation
+## Limitation
 The system could not loop forever while the button button is pressed all the time. It would go to the inifinity loop becasue of missing the function of turning off the LED. 
 
 ## Task C
@@ -378,10 +378,10 @@ tx_uart:
 ```
 To achieve the target, the function of {tx_uart} should firstly load the USART ISR register to enable the board to recieve message. After that, the input message stored in the register needs to be transmitted into transmit data register. For each of time of button is pressed, a byte of character is transmitted into R5 through data transmitt register. Moreover, all the end of string put a "?" to tell the system which the message finishes so that the system would not loop again and again even though the message is finished transmitted. Everytime we press the button, we will see message appeas on terminal progam like PuTTY
 
-##Output 
+## Output 
 The function module would start to transmit the data, which stores in register 1, to another function by pressing the button each time. 
 
-##Limitation
+## Limitation
 * Each end of string is required to have an '?', otherwise, the system does not know what is the end of the string it reads. It would keep looping forever.
 
 ## Task B
@@ -451,10 +451,10 @@ no_reset:
 ```
 This code above is main part of {loop_forever} after enabling the USART1, load {USART_ISR} and error checking to this function. For receiving the characters from computer, the port of USART_RDR is enable and stored into the R3. However, it should consider whether the buffer is full or not, the {incoming_counter} is used to check if the received data stored into buffer exceed the size of buffer. It would automatically jump to reset function to UART receiver while the string of character is oversizing. After that, the system would stop to loop if the receved character matche the {terminating_char}, otherwise, it will loop forever until the expected character matches with the string of data received. We will see the data we input from PuTTY appears on the address 0x20000000
 
-##Output 
+## Output 
 The function received the string characters, it would keep looping until the terminated characters are defined. 
 
-##Limitation 
+## Limitation 
 * The function would occur the error of framing and overrun error which is requested to put a clear error function to reset and re-enable those register.
   
 ## Task C
@@ -509,8 +509,8 @@ The {transmit_loop} receives the output of a string from the function of {tx_str
     BX LR                                 @ Return from main function
 ```
 
-##Output
-This part, we use UART4 and USART1, one board recieve the input data from pc and the transmit to another board via UART4 and also transmit to PC via USART1, if we input message on one computer, when the terminal character is recieved, the PuTTY on another computer will simutanueouly show the message just entered on another computer
+## Output
+This part, we use UART4 and USART1, one board recieve the input data from pc and the transmit to another board via UART4 and also transmit to PC via USART1, if we input message on one computer, when the terminal character is recieved, the PuTTY on another computer will simutanueouly show the message just entered on another computer.
 
 
 ## 1.6.2 Module 4 (Hardware Timer)
@@ -558,7 +558,7 @@ Hence, the prescalar that is require to reach a 0.1ms for the prescalar is 3200.
                             						= 8*8^8/8^10^4
                            						=8*10^4Hz
                             						= 0.1 millionsecond. 
-##Output
+## Output
 The LED of the board should be able to flases with a frequency of 8^10^4 Hz. 
 
 ## Task C
