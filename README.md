@@ -3,7 +3,7 @@
 
 ## 1.3 Module 1 (Memory and Pointers)
 
-### Task A
+## Task A
 Task A aims to convert the letter either from lower case to upper case or in the opposite way by defining the ASCII string memory. 
 ```arm
 .data
@@ -77,11 +77,11 @@ to_upper:
 The function {to_upper} has the similar operation theory with the module of {to_lower}. The only thing which is necessary to be changed is that it is required to change the line of code from {ADD R3, R3, #'a' - 'A'} to {SUB R3, R3, #'a' - 'A'} because the lower-case English letters has a higher hexdecmial number than upper-case characters.
 After all this, the final result will appear on R1, we need to check memory, monitor the address of R1, select ASCII, and we will see the string after transfer.
 
-## Output
+### Output
 All of the letters should be converted the either upper or lower case of characters which depends on the what the expected result that we want to. 
 
 
-### Task B
+## Task B
 
 The purpose of building Task B is to allow the amount function module to shift value to be either negative or positive, which enable the decoding and encoding operation. 
 
@@ -118,10 +118,10 @@ string_loop:
 The main idea of this part is to add the amount of value which needs to be shift with the specific byte in the input string. After adding the setting shift value, the hexdecimal number of that particular byte increases and convert the expected character. R3 would have the increment of index of 1 which prepares one byte of space for the next converted value in byte. 
 After all this, the final result will appear on R1, we need to check memory, monitor the address of R1, select ASCII, and we will see the string after transfer.
 
-## Output 
+### Output 
 All the input string is shifted by setting shift value of 3, which is stored in the address of 0x200000000 in hex number. Beyond this, all the the last three element of 'X''Y''Z' should corresponding to the letter of 'A''B''C' for each one independently.  
 
-### Task C
+## Task C
 
 The idea of the task is to develop a system which is allowed to encode or decode each byte of a wide range of letter input to the expected output. This behaviour is done by the system through comparing the correspoding character in a stirng with the input character so that the system could be able to get the expected output. 
 
@@ -205,7 +205,7 @@ After all this, the final result will appear on R1, we need to check memory, mon
 
 ## 1.4 Exercise 2 (Digital I/O)
 
-### Task A
+## Task A
 
 The objective of task A is to enable the LED pattern. 
 
@@ -223,7 +223,7 @@ To enable the LED pattern, the light pattern in binary is stored by R4 for later
 ##Output
 Four LEDs will light up, two blue and two red on the board of STM32.
 
-### Task B
+## Task B
 
 ```arm
 main:
@@ -294,7 +294,7 @@ The light patterns would light one by one by pressing the button each time.
 ##Limitation
 The system could not loop forever while the button button is pressed all the time. It would go to the inifinity loop becasue of missing the function of turning off the LED. 
 
-### Task C
+## Task C
 
 Task C requests to turn the LEDs off by pressing the button each time based on the previous assembly code in Task B. 
 
@@ -317,13 +317,13 @@ LED:
 ##Output 
 The pattern of light would be ON one by one as the button is pressing, and it would be turned off in sequence by pressing the button again if all the LEDs light up.
 
-### Task D
+## Task D
 
 This part we will check how many centain alphabeta appears in a given string, when we run the code, every time we press button, the corresspond numbers of LED will light up, "AAbCccDDDDeeeffg", this is our string, the code will check from a to z, when we first press the button, check the number of "a/A", there are two "a/A", so two leds will light up, and will loop to letter "z/Z".
 
 ## 1.5 Exercise 3 (Serial communication)
 
-### Task A
+## Task A
 Task A is requested to build a function which allows to transmit a strings of characters from R1 to another function while the button on the STM 32 board is pressed. 
 
 By following the task, it should enable all the basic functions that it needs, which is shown as below.
@@ -536,10 +536,10 @@ trigger_prescaler:
 ```
 The lines of code indicates the prescalar of 7 is stored into R1 with the setting of TIM_PSC. The code would immediately jump to the function of {triiger_prescalar} and link back to the main function after it stores the prescalar into TIM2. The frequency of the timer could be able to change by selecting and adjusting the appropriate value of prescalar. 
 
-## Limitation 
+### Limitation 
 * The delay function need to check and compare to the count value in TIM_CNT and also it is required to set set the TIM_CNT to 0 manually. 
 
-### Task B
+## Task B
 According to the data sheet, the formula of desired output frequency for STM32 is 
 
         				Desired Output Frequency = TIM_CLK/((TIM_PSC + 1)/(TIM_ARR+1))
@@ -561,7 +561,7 @@ Hence, the prescalar that is require to reach a 0.1ms for the prescalar is 3200.
 ##Output
 The LED of the board should be able to flases with a frequency of 8^10^4 Hz. 
 
-### Task C
+## Task C
 
 ```arm
 main:
@@ -622,10 +622,10 @@ pwm_off_loop:
 
 The PWM provide an almost absoluate square wave through reading the current time of TIM2 and compare it with the expected setting value. The loop continues to loop until the current value of time is greater than the setting value, and it produces an output after looping finishes. Similarly, the output from the function {pwm_on_loop} will be not generated only when the looping of {pwm_off_loop} is finished after comparing the current time. 
 
-## Output
+### Output
 ![image](https://github.com/GuoJiashu/JJJ/assets/160695086/24736331-ba70-4b0d-ac8f-c5f908dfb1d2)
 
 The discovered kit board outputs an frequency in 1.17 seconds by seleting the value of prescalar of 8 with a value of counter overflow of 1.
-## Limitation
+### Limitation
 
 * The output frequency of the discover board becomes hard to work out because of adding a PWM function to loop again and agagin. It increases the difficulty of calculations which not only needs to work out the prescalar value and value of counter overflow, it still needs to consider the element of period and on_time. 
