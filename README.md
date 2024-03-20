@@ -644,7 +644,7 @@ The discovered kit board outputs an frequency in 1.17 seconds by seleting the va
 the basic operation theory of the task is to combine the pervious four tasks to perform exptect output. It should firstly connect using wires to connect the port between stm32 discovery board and another one. 
 
 ### Output 
-The PC would send it input message into the port of UART to the first board. The code would be encode the message by comparing with the substitution cipher. After that, the message of the first board sends to the second board which should be able to decode the message. The specific LED pattern will be lighten while the system detect the letter of alphabet, which would be able to flashes in 500ms interval. 
+The PC should send it input a message string into the port of UART to the first board. The first board that received encodes the message by comparing with the substitution cipher. After that, the message of the first board sends to the second board which should be able to decode the message. The specific LED pattern will be lighten while the system detect the letter of alphabet, which would be able to flashes in 500ms interval. 
 
 ### Limitations
 * There are too many module of tasks to combine with. It would greatly increase the possibility of error occruing in the tramitting process between the boards.
