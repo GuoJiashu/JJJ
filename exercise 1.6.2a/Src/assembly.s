@@ -97,7 +97,7 @@ trigger_prescaler:
 	@ store a value for the prescaler
 	LDR R0, =TIM2	@ load the base address for the timer
 
-	LDR R1, = 1000@ make the timer overflow after counting to only 1
+	LDR R1, = 1000
 	STR R1, [R0, TIM_ARR] @ set the ARR register
 
 	LDR R8, =0x00
