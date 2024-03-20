@@ -565,11 +565,11 @@ The desired output frequency is 0.1ms, which equals to the frequency of 1*10^-4H
 Hence, the prescalar that is require to reach a 0.1ms for the prescalar is 3200. However, by considering the use of PWM function, the actual output of the function is required to be worked out. 
 
     						Actual Output Frequency = Timer Frequency/(period+1)
-                            						= 8*8^8/8^10^4
+                            						= 8*10^8/8*10^4
                            							=8*10^4Hz
                             						= 0.1 millionsecond. 
 ## Output
-The LED of the board should be able to flases with a frequency of 8^10^4 Hz. 
+The LED of the board should be able to flases with a frequency of 8*10^4 Hz. 
 
 ## Task C
 
@@ -639,3 +639,13 @@ The discovered kit board outputs an frequency in 1.17 seconds by seleting the va
 ### Limitation
 
 * The output frequency of the discover board becomes hard to work out because of adding a PWM function to loop again and agagin. It increases the difficulty of calculations which not only needs to work out the prescalar value and value of counter overflow, it still needs to consider the element of period and on_time. 
+
+## Exercise 5
+the basic operation theory of the task is to combine the pervious four tasks to perform exptect output. It should firstly connect using wires to connect the port between stm32 discovery board and another one. 
+
+### Output 
+The PC would send it input message into the port of UART to the first board. The code would be encode the message by comparing with the substitution cipher. After that, the message of the first board sends to the second board which should be able to decode the message. The specific LED pattern will be lighten while the system detect the letter of alphabet, which would be able to flashes in 500ms interval. 
+
+### Limitations
+* There are too many module of tasks to combine with. It would greatly increase the possibility of error occruing in the tramitting process between the boards.
+* Furthermore, there are few registers to store the value for either each value or port addresss, which is not enough to be used. 
