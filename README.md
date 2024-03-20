@@ -266,16 +266,17 @@ Enable the port(GPIOA) for the input button and ensure it is ON, which the syste
 
 ```arm 
 LED:
-	LDR R0, =GPIOE  @ load the address of the GPIOE register into R0
+	LDR R0, =GPIOE  	  @ load the address of the GPIOE register into R0
 	STRB R4, [R0, #ODR + 1]   @ store this to the second byte of the ODR (bits 8-15)
-	LSL R4,R4,#1@EOR R4, #0xFF	@ toggle all of the bits in the byte (1->0 0->1)
+	
+	LSL R4, R4, #1       @ Left shift the value in R4 by 1, moving to the next LED in a sequence.
+	ADD R4, R4, #1       @ Increment the value in R4 by 1, turning on the next LED.
+	BL delay_function    @ Call a subroutine named 'delay_function' to introduce a delay.
+	CMP R4, 0b11111111   @ Compare the value in R4 with #255 (all LEDs on) to check if all LEDs are turned on
+	BEQ main             @ If R4 is equal to #255, branch to the 'main' function
 
-	ADD R4,R4,#1
-	BL delay_function
-	CMP R4,0b11111111
-	BEQ main
 
-	B program_loop
+	B program_loop 	     @return to the program_loop label
 ```
 Enable the port of LED (GPIOE) and make the LED shifts next one by increment of 1. To ensure the system could be able to loop forever for every time the button is pressed, a reset function is setted while all of LED is ON after eight times of the button is pressed. 
 
@@ -284,13 +285,13 @@ Enable the port of LED (GPIOE) and make the LED shifts next one by increment of 
 
 ```arm
 delay_function:
-	MOV R6, #0x0100000
+    MOV R6, #0x0100000          @ Initialize R6 with a delay counter value
 
 not_finished_yet:
-	SUBS R6, 0x01
-	BNE not_finished_yet
+    SUBS R6, R6, #0x01          @ Decrement the delay counter in R6 by 1
+    BNE not_finished_yet        @ If R6 is not zero, branch back to continue the loop
 
-	BX LR @ return from function call
+    BX LR                       @ Return from the function call once the delay counter reaches zero
 ```
 Additionally, a delay function is imported to this system to increase the time of the operation of system, which prevents from fast transmitting from the system to the board while pressing the button. Furthermore, it increases the stability of the system and protect it from crashing or error occuring during running process. 
 Every time we press the button, one LED will be enabled untill all leds are enabled, then it will unenabled last time.
