@@ -3,9 +3,13 @@
 
 .global main
 
+#include "initialise.s"
+
 .data
-incoming_buffer: .space 62
-terminating_char: .byte 'a'
+.align
+
+incoming_buffer: .space 62               @ Define a buffer to store incoming data
+terminating_char: .byte '-'              @ Define the terminating character for data reception
 substitutionTable: .asciz "zyxwvutsrqponmlkjihgfedcba" @ Define a substitution table for encoding/decoding
 
 .text
@@ -17,9 +21,6 @@ main:
     BL enable_usart1                     @ Call function to enable UART communication
 
     LDR R6, =incoming_buffer             @ Load the address of the incoming buffer into R6
-    LDR R7, =incoming_counter            @ Load the address of the incoming counter into R7
-
-    LDRB R7, [R7]                        @ Load the value of incoming_counter into R7
 
     MOV R8, #0x00                        @ Initialize R8 to 0
 
@@ -49,53 +50,60 @@ receive_loop:
 
     CMP R3, R4                           @ Compare received byte with terminating character
 
-    BEQ lower_encode                  @ If received byte equals terminating character, branch to transmit_string
+    BEQ decode                  @ If received byte equals terminating character, branch to transmit_string
 
 clear_error:
 
     LDR R1, [R0, USART_ICR]              @ Load the USART_ICR register into R1
     ORR R1, 1 << UART_ORECF | 1 << UART_FECF @ Set the overrun error clear flag and framing error clear flag
     STR R1, [R0, USART_ICR]              @ Store the modified value back to USART_ICR
-    B receive_loop 
-    
-lower_encode:
-    LDR R1, =incoming_buffer
-    LDR R2, =substitutionTable
+    B receive_loop                       @ Branch back to receive_loop
 
-    BL applycipher
+decode:
+    @LDR R1, =incoming_buffer
+    LDR R2, =#substitutionTable
+	MOV R7, #0	@counter
+
+    BL decipher
     B transmit_string
 
-applycipher:
-    LDRB R5, [R1], #1
-	CMP R5, #0
-    BEQ convert_done
-    CMP R5, #'A'
-    BLT encoder
-    CMP R5, #'Z'
-    BGT next_char
-    ADD R5, R5, #'a' - 'A'
+decipher:
+    LDRB R5, [R6]
 
-encoder:
-    @ Encoding
-    SUBS R5, R5, #'a'
-    LDRB R5, [R2, R5]
-    STRB R5, [R1, #-1]!
-    B next_char
+    CMP R5, #'a'
+    BLT store
+    CMP R5, #'z'
+    BGT store
+
+search_loop:
+	LDRB R3, [R2, R7]	@load the R3th bit from sub table
+	CMP R5, R3
+	BEQ decoder
+
+	ADD R7, #1
+	B search_loop
+
+decoder:
+	ADD R7, #'a'
+	MOV R5, R7
+
+store:
+    STRB R5, [R6], #1
 
 next_char:
-    LDRB R5, [R1], #1
-    CMP R5, #0
+    CMP R5, R4
     BEQ convert_done
-    B applycipher
+    MOV R7, #0
+    B decipher
 
 convert_done:
     BX LR
-    
+
 transmit_string:
 
-    BL enable_usart1                     @ Call function to enable UART communication
+    BL enable_usart1                       @ Call function to enable UART communication
     LDR R0, =USART1                      @ Load the base address of USART1 into R0
-    LDR R1, =incoming_buffer
+    LDR R3, =incoming_buffer
 
 transmit_loop:
 
@@ -104,7 +112,7 @@ transmit_loop:
     TST R1, 1 << UART_TXE                @ Test for TXE (Transmit Data Register Empty) flag
     BEQ transmit_loop                    @ If TXE is not set, branch back to transmit_loop
 
-    LDRB R5, [R1], #1                    @ Load a byte from the tx_string buffer and increment the buffer pointer
+    LDRB R5, [R3], #1                    @ Load a byte from the tx_string buffer and increment the buffer pointer
 
     STRB R5, [R0, USART_TDR]             @ Transmit the loaded byte via USART_TDR
 
@@ -112,6 +120,8 @@ transmit_loop:
 
     BNE transmit_loop                    @ If transmitted byte is not the terminating character, branch back to transmit_loop
 
-    B end @ Return from main function
+	B end
+
 end:
+
 	B end
