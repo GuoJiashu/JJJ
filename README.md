@@ -212,11 +212,10 @@ The objective of task A is to enable the LED pattern.
 ```arm 
 main:
 	
-	LDR R4, = 0b00110011 
-
-	LDR R0, =GPIOE  
-	STRB R4, [R0, #ODR + 1]   
-	EOR R4, #0xFF	
+	LDR R4, = 0b00110011	@ Toad a pattern for the set of LEDs (every second one is on)
+	LDR R0, =GPIOE 		@ Load the address of the GPIOE register into R0
+	STRB R4, [R0, #ODR + 1]	@ Store this to the second byte of the ODR (bits 8-15)
+	EOR R4, #0xFF		@ Toggle all of the bits in the byte (1->0 0->1)
 ```
 To enable the LED pattern, the light pattern in binary is stored by R4 for later using. After that, it only needs to load the address of GPIOE and store it to the second byte of ODR. The LED pattern would be ON after toggling all of the bits in byte. 
 
