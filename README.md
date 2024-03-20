@@ -568,6 +568,41 @@ Hence, the prescalar that is require to reach a 0.1ms for the prescalar is 3200.
                             						= 8*10^8/8*10^4
                            							=8*10^4Hz
                             						= 0.1 millionsecond. 
+
+### task for 1ms
+						Actual Output Frequency = Timer Frequency/(period+1)
+                            				   1ms = 1*10^3 = F/8*10^4+1
+                           						=8*10^7Hz
+
+
+     					Desired Output Frequency = TIM_CLK/((TIM_PSC + 1)/(TIM_ARR+1))
+
+                        				8*10^7Hz = 32MHz * 10/TIM_PSC + 1
+
+                            					P= 3
+### task for 1s
+					Actual Output Frequency = Timer Frequency/(period+1)
+                            				   1s = 1Hz = F/8*10^4+1
+                           						=8.0001*10^4Hz
+
+
+     					Desired Output Frequency = TIM_CLK/((TIM_PSC + 1)/(TIM_ARR+1))
+
+                        				8.0001*10^4Hz = 32MHz * 100/TIM_PSC + 1
+
+                            					P= 39998
+### task for 1 hour
+					Actual Output Frequency = Timer Frequency/(period+1)
+                            				3600s = 2.78*10^-4Hz= F/8*10^4+1
+                           						=23.22Hz
+
+
+     					Desired Output Frequency = TIM_CLK/((TIM_PSC + 1)/(TIM_ARR+1))
+
+                        				23.22Hz = 32MHz * 1/TIM_PSC + 1
+
+                            					P= 990524
+                            		 
 ## Output
 The LED of the board should be able to flases with a frequency of 8*10^4 Hz. 
 
