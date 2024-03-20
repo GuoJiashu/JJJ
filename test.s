@@ -5,6 +5,7 @@
 
 .data
 prompt: .asciz "AA" @ Define a string
+alphabets: .asciz "abcdefghijklmnopqrstuvwxyz"
 substitutionTable: .asciz "zyxwvutsrqponmlkjihgfedcba" @ Define a substitution table for encoding/decoding
 
 .text
