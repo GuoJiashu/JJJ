@@ -3,24 +3,37 @@ Minutes and agendas of the group meeting
 Where: Zoom meeting 
 Time: 2pm – 5pm (4/3/2024)
 Person: Junhao FU, Jiashu Guo
-Discussion: Junhao FU and Jiashu Guo discusses about with the part 3, Question 1. Debugging the 
-correcting the issues that the system had is the main direction with this group meeting. During 
-the meeting, both of us fixed the bugs in the previous system to ensure it could operate properly. 
+Task forcus Today: Exercise 1.3.2a (Jiashu GUO)
+             Exercise 1.3.2c(Junhao FU)
+Discussion: Junhao FU and Jiashu Guo discusses about with the EXERCISE 1.3.2a and EXERCISE 1.3.2c. 
+Debugging the correcting the issues that the system had is the main direction with this group meeting. 
+During the meeting, both of us fixed the bugs in the previous system to ensure it could operate properly. 
 Furthermore, after experiencing some deep thinking and discussions, we decided to add a new function 
 which allows the system define both capital and lower-case letters so as to make the system have more 
 accurate operation. 
+
+Where: Fisher Library 
+Time:2pm - 4pm (5/3/2024)
+Person: Jiashu Guo, Junhao FU
+Task Forcus Today: EXERCISE 1.3.2c (Junhao FU/Jiashu GUO)
+Discussion: We were fixing the bug that we met for building the idea that mentioned yesterday. However, we 
+still cannot fixed the issues in the system which seems could not correctly adding new function of changing 
+upper case and lower case to the 1.3.2c. 
 
 
 Where: Fisher Library
 Time: 12pm - 5pm (15/3/2024)
 Person: Junhao FU, Jiashu Guo
-Discussion: Jiashu Guo and Junhao Fu discusses the the issues that met so far the Exercise 3b. Furthermore, the 
-distribution of written plan of each task is discussed and share with each other. 
+Task Forcus Today: EXERCISE 1.5.2b
+                   Share distribution of outline for the coding interpretations
+Discussion: Jiashu Guo and Junhao Fu discusses the the issues that met so far the Exercise 1.5.2b. The issues
+are finally fixed after 1 hours. Furthermore, the distribution of written plan of each task is discussed and share with each other. 
 
 
 Where: PNR Learning hub
 Time: 2pm - 6pm (20/3/2024)
 Person: Junhao FU, Jiashu Guo
+Task Forcus Today: EXERCISE 1.3.2D, 1.3.2E
 Discussion: Junhao FU and Jiashu Guo have discussion about the Exercise 3d, 3e and the operation theory of
 Exercise 5.  We both debugged and tried to work out where is the issue of the function. All of the other
 Exercise question has been solved. Besides, we tried to build the function for Exercise 5. However, there 
