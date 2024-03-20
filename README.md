@@ -547,15 +547,15 @@ The desired output frequency is 0.1ms, which equals to the frequency of 1*10^-4H
 
     					Desired Output Frequency = TIM_CLK/((TIM_PSC + 1)/(TIM_ARR+1))
 
-                        				8*10^8Hz = 32MHz * 100/8
+                        				8*10^8Hz = 32MHz * 100/TIM_PSC + 1
 
-                            					P= 2500
+                            					P= 3
 
 Hence, the prescalar that is require to reach a 0.1ms for the prescalar is 3200. However, by considering the use of PWM function, the actual output of the function is required to be worked out. 
 
     						Actual Output Frequency = Timer Frequency/(period+1)
                             						= 8*8^8/8^10^4
-                           						=8*10^4Hz
+                           							=8*10^4Hz
                             						= 0.1 millionsecond. 
 ## Output
 The LED of the board should be able to flases with a frequency of 8^10^4 Hz. 
